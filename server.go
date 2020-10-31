@@ -3,6 +3,6 @@ package main
 import "fmt"
 
 func main() {
-	anju := "geming"
+	anju := "gemingh"
 	fmt.Printf("Anjuuuu %s \n", anju)
 }
