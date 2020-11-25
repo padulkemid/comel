@@ -1,14 +1,26 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 type Data struct {
 	path   string
 	scheme string
+}
+
+type PersonData struct {
+	Username string
+	Password string
+}
+
+type SuccessResponse struct {
+	Message   string
+	CreatedAt time.Time
 }
 
 func comelAvailable(w http.ResponseWriter, r *http.Request) {
@@ -25,14 +37,31 @@ func loginAja(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("method: %s \n", r.Method)
 
 	if r.Method == "POST" {
-		err := r.ParseForm()
+
+		p := PersonData{}
+
+		err := json.NewDecoder(r.Body).Decode(&p)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("username: %s", r.Form["username"])
-		fmt.Printf("password: %s", r.Form["password"])
+		s := SuccessResponse{
+			Message:   "Successed login with username: " + p.Username,
+			CreatedAt: time.Now().Local(),
+		}
+
+		success, err := json.Marshal(&s)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("body: %+v", p)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(success)
 	}
 }
 
